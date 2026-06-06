@@ -1,4 +1,5 @@
 import express from "express"
+import bcrypt from "bcryptjs"
 
 const products = [
   {
@@ -32,6 +33,7 @@ const products = [
     stock: 10
   }
 ]
+const users = []
 
 const server = express()
 
@@ -59,7 +61,8 @@ server.post("/products", (req, res) => {
     const body = req.body
     const newProduct = {
     id: products.length + 1, ...body
-    }
+  }
+  products.push(newProduct)
     res.json(newProduct)
 })
 
@@ -86,6 +89,27 @@ server.delete("/products/:id", (req, res) => {
     res.json({message: "Producto eliminado"})
 
 })
+
+server.post("/auth/register", async (req, res) => { 
+  const body = req.body
+  const id = users.length + 1
+  const { password, username, email } = body
+  const hashedPassword = await bcrypt.hash(password, 10)
+  const newUser = {
+    id,
+    username,
+    email,
+    password: hashedPassword,
+  }
+  
+  users.push(newUser)
+  const {password: passwordNewUser, ...data}= newUser
+
+  res.json(data)
+  
+})
+
+server.post("/auth/login", (req, res) => { })
 
 server.listen(PORT, () => {
     console.log(`servidor http://localhost:${PORT}`)
