@@ -1,5 +1,7 @@
 import express from "express"
 import bcrypt from "bcryptjs"
+import { rateLimit } from "express-rate-limit"
+import jwt from "jsonwebtoken"
 
 const products = [
   {
@@ -38,16 +40,26 @@ const users = []
 const server = express()
 
 server.use(express.json())
+
 const PORT = 40000
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  limit: 5, 
+
+  handler: (request, response) => {
+    response.status(429).json({ error: "Too many requests, please try again later." })
+  }
+})
+
+
 server.get("/", (req, res) => {
-    res.json([{"status": "1"}])
+    res.json([{"status": 1}])
 })
 
 server.get("/products", (req, res) => {
     res.json(products)
 })
-
 
 server.get("/products/:id", (req, res) => {
     const id = +req.params.id
@@ -57,6 +69,7 @@ server.get("/products/:id", (req, res) => {
     }
     res.json(foundProduct)
 })
+
 server.post("/products", (req, res) => {
     const body = req.body
     const newProduct = {
@@ -109,7 +122,34 @@ server.post("/auth/register", async (req, res) => {
   
 })
 
-server.post("/auth/login", (req, res) => { })
+server.post("/auth/login", limiter, async (req, res) => {
+  const {body} = req
+
+  const { email, password } = body
+  
+  if (!email || !password) {
+    return res.status(401).json({error :"unauthorized"})
+  }
+
+  const foundUser = users.find(user => user.email === email)
+  if (!foundUser) {
+    return res.status(403).json({error :"unauthorized"})
+  }
+
+  const ValidPassword = await bcrypt.compare(password, foundUser.password)
+  
+  if (!ValidPassword) {
+     return res.status(403).json({error :"unauthorized"})
+  }
+  const payload = {id: foundUser.id, username: foundUser.username, email: foundUser.email}
+  const secretKey = "contraseñasecreta"
+  const token = jwt.sign(payload, secretKey, { expiresIn:"1min"})
+
+   res.json({token})
+})
+
+
+
 
 server.listen(PORT, () => {
     console.log(`servidor http://localhost:${PORT}`)
