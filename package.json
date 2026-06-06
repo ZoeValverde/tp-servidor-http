@@ -1,0 +1,24 @@
+{
+  "name": "tp-servidor-http",
+  "version": "1.0.0",
+  "description": "api-rest",
+  "main": "app.js",
+  "scripts": {
+    "dev": "node --watch app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZoeValverde/tp-servidor-http.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/ZoeValverde/tp-servidor-http/issues"
+  },
+  "homepage": "https://github.com/ZoeValverde/tp-servidor-http#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
