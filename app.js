@@ -3,38 +3,7 @@ import bcrypt from "bcryptjs"
 import { rateLimit } from "express-rate-limit"
 import jwt from "jsonwebtoken"
 
-const products = [
-  {
-    id: 1,
-    name: "Teclado Mecánico",
-    price: 45000,
-    stock: 12
-  },
-  {
-    id: 2,
-    name: "Mouse Gamer",
-    price: 25000,
-    stock: 8
-  },
-  {
-    id: 3,
-    name: "Monitor 24 pulgadas",
-    price: 180000,
-    stock: 5
-  },
-  {
-    id: 4,
-    name: "Auriculares Bluetooth",
-    price: 32000,
-    stock: 15
-  },
-  {
-    id: 5,
-    name: "Webcam HD",
-    price: 27000,
-    stock: 10
-  }
-]
+const products = []
 const users = []
 
 const server = express()
@@ -52,13 +21,33 @@ const limiter = rateLimit({
   }
 })
 
+const authMiddleware = (req, res, next) => {
+  const header = req.headers.authorization
+  
+  if (!header || !header.startsWith("Bearer")) {
+    return res.status(401).json({ error: "Unauthorized" })
+  }
+
+  const token = header.split(" ")[1]
+
+  try {
+    const decoded = jwt.verify(token, "contraseñasecreta")
+    
+    req.userLogged = decoded
+  } catch (e) {
+    res.status(401).json({error: e.message})
+ }
+  next()
+}
 
 server.get("/", (req, res) => {
     res.json([{"status": 1}])
 })
 
-server.get("/products", (req, res) => {
-    res.json(products)
+server.get("/products", authMiddleware, (req, res) => {
+  const userLogged = req.userLogged
+  const filterProducts = products.filter(product=> product.userId=== userLogged.id )
+  res.json(filterProducts)
 })
 
 server.get("/products/:id", (req, res) => {
@@ -70,10 +59,13 @@ server.get("/products/:id", (req, res) => {
     res.json(foundProduct)
 })
 
-server.post("/products", (req, res) => {
-    const body = req.body
+server.post("/products", authMiddleware, (req, res) => {
+  const body = req.body
+  const userLogged = req.userLogged
+
     const newProduct = {
-    id: products.length + 1, ...body
+      id: products.length + 1, ...body,
+      userId: userLogged.id
   }
   products.push(newProduct)
     res.json(newProduct)
