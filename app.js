@@ -4,9 +4,6 @@ import { rateLimit } from "express-rate-limit"
 import jwt from "jsonwebtoken"
 import {connect, Schema, model} from "mongoose"
 
-const products = []
-const users = []
-
 const connectDb = async () => {
   
   try {
@@ -32,6 +29,21 @@ const userSchema = new Schema({
 }
 )
 const User = model("users", userSchema)
+
+const productSchema = new Schema({
+  name: {type: String, required: true},
+  price: {type: Number, default: 0, required: true},
+  stock: {type:Number, default: 0, required: true},
+  available: { type: Boolean, default: false },
+  userId:{type: Schema.Types.ObjectId, ref:"User", required: true}
+},
+{
+    versionKey: false,
+    timestamps:true
+}
+)
+
+const Product= model("Product", productSchema)
 
 const server = express()
 
@@ -71,11 +83,16 @@ server.get("/", (req, res) => {
     res.json([{"status": 1}])
 })
 
-server.get("/products", authMiddleware, (req, res) => {
-  const userLogged = req.userLogged
-  const filterProducts = products.filter(product=> product.userId=== userLogged.id )
-  res.json(filterProducts)
+server.get("/products", authMiddleware, async (req, res) => {
+ try {
+    const userLogged = req.userLogged
+    const filterProducts = await Product.find({ userId: userLogged.id })
+    res.json(filterProducts)
+  } catch (error) {
+    res.status(500).json({error: "Error fetching products" })
+  }
 })
+
 
 server.get("/products/:id", (req, res) => {
     const id = +req.params.id
@@ -86,17 +103,35 @@ server.get("/products/:id", (req, res) => {
     res.json(foundProduct)
 })
 
-server.post("/products", authMiddleware, (req, res) => {
-  const body = req.body
+server.post("/products", authMiddleware, async (req, res) => {
+  try { 
+    const body = req.body
   const userLogged = req.userLogged
 
-    const newProduct = {
-      id: products.length + 1, ...body,
-      userId: userLogged.id
-  }
+  const newProduct = await Product.create({
+    name: body.name,
+    price: body.price,
+    stock: body.stock,
+    available: body.stock > 0, 
+    userId: userLogged.id
+  })
+  
+  newProduct.save()
 
-  products.push(newProduct)
-    res.json(newProduct)
+  const publicDataProduct = {
+    id: newProduct._id,
+    name: newProduct.name,
+    price: newProduct.price,
+    stock: newProduct.stock,
+    available: newProduct.available,
+    createAt: newProduct.createdAt,
+    updateAt: newProduct.updatedAt
+  }
+    res.json(publicDataProduct)
+  }
+  catch (error) {
+     res.status(500).json({error: "no se creo el producto"})
+  }
 })
 
 server.put("/products/:id", (req, res) => {
