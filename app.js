@@ -1,10 +1,37 @@
 import express from "express"
-import bcrypt from "bcryptjs"
+import bcrypt from "bcryptjs" 
 import { rateLimit } from "express-rate-limit"
 import jwt from "jsonwebtoken"
+import {connect, Schema, model} from "mongoose"
 
 const products = []
 const users = []
+
+const connectDb = async () => {
+  
+  try {
+
+    await connect("mongodb://localhost:27017/products_db")
+    console.log("se conecto al db")
+
+   }
+  catch (error) {
+    console.log("error conexion db", error.message)
+  }
+
+}
+
+const userSchema = new Schema({
+  username: {type: String, required: true},
+  email: {type: String, required: true, unique: true},
+  password:{type: String, required: true}
+},
+  {
+    versionKey: false,
+    timestamps:true
+}
+)
+const User = model("user", userSchema)
 
 const server = express()
 
@@ -67,6 +94,7 @@ server.post("/products", authMiddleware, (req, res) => {
       id: products.length + 1, ...body,
       userId: userLogged.id
   }
+
   products.push(newProduct)
     res.json(newProduct)
 })
@@ -97,20 +125,25 @@ server.delete("/products/:id", (req, res) => {
 
 server.post("/auth/register", async (req, res) => { 
   const body = req.body
-  const id = users.length + 1
   const { password, username, email } = body
   const hashedPassword = await bcrypt.hash(password, 10)
-  const newUser = {
-    id,
+  const newUser = await User.create({
     username,
     email,
     password: hashedPassword,
-  }
+  })
   
-  users.push(newUser)
-  const {password: passwordNewUser, ...data}= newUser
+  newUser.save()
 
-  res.json(data)
+  const publicDataUser = {
+    id: newUser.id,
+    username: newUser.username,
+    email: newUser.email,
+    createAt: newUser.createdAt,
+    updatedAt: newUser.updatedAt
+  }
+
+  res.json(publicDataUser)
   
 })
 
@@ -144,5 +177,6 @@ server.post("/auth/login", limiter, async (req, res) => {
 
 
 server.listen(PORT, () => {
+  connectDb()
     console.log(`servidor http://localhost:${PORT}`)
 }) 
