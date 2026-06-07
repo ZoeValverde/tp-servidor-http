@@ -31,7 +31,7 @@ const userSchema = new Schema({
     timestamps:true
 }
 )
-const User = model("user", userSchema)
+const User = model("users", userSchema)
 
 const server = express()
 
@@ -148,7 +148,8 @@ server.post("/auth/register", async (req, res) => {
 })
 
 server.post("/auth/login", limiter, async (req, res) => {
-  const {body} = req
+  try{
+  const { body } = req
 
   const { email, password } = body
   
@@ -156,7 +157,9 @@ server.post("/auth/login", limiter, async (req, res) => {
     return res.status(401).json({error :"unauthorized"})
   }
 
-  const foundUser = users.find(user => user.email === email)
+    const foundUser = await User.findOne({ email })    
+    console.log(foundUser)
+
   if (!foundUser) {
     return res.status(403).json({error :"unauthorized"})
   }
@@ -164,13 +167,17 @@ server.post("/auth/login", limiter, async (req, res) => {
   const ValidPassword = await bcrypt.compare(password, foundUser.password)
   
   if (!ValidPassword) {
-     return res.status(403).json({error :"unauthorized"})
+     return res.status(403).json({error :"unauthorized", ValidPassword})
   }
-  const payload = {id: foundUser.id, username: foundUser.username, email: foundUser.email}
+  const payload = {id: foundUser._id, username: foundUser.username, email: foundUser.email}
   const secretKey = "contraseñasecreta"
-  const token = jwt.sign(payload, secretKey, { expiresIn:"1min"})
+  const token = jwt.sign(payload, secretKey, { expiresIn:"1h"})
 
-   res.json({token})
+    res.json({ token })
+  }
+  catch (error) {
+    res.status(500).json({error: error.message})
+  }
 })
 
 
