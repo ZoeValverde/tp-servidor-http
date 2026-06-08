@@ -159,13 +159,18 @@ server.put("/products/:id", async (req, res) => {
   }
 })
 
-server.delete("/products/:id", (req, res) => {
-    const id = +req.params.id
-    const index = products.findIndex(product => product.id === id)
-    if(index=== -1) return res.status(404).json({error: "not found"})
-    products.splice(index, 1) 
-    res.json({message: "Producto eliminado"})
-
+server.delete("/products/:id", async (req, res) => {
+  try {
+    const id = req.params.id  
+  const foundProduct = await Product.findByIdAndDelete(id)
+  if (!foundProduct) {
+      return res.status(404).json({ error: "Not found" })
+    }
+  res.json({message: "Producto eliminado"})
+  }
+  catch (error) {
+    res.status(400).json({error: "Invalid Id"})
+  }
 })
 
 server.post("/auth/register", async (req, res) => { 
@@ -203,8 +208,6 @@ server.post("/auth/login", limiter, async (req, res) => {
   }
 
     const foundUser = await User.findOne({ email })    
-    console.log(foundUser)
-
   if (!foundUser) {
     return res.status(403).json({error :"unauthorized"})
   }
