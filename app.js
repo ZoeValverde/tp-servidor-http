@@ -94,13 +94,16 @@ server.get("/products", authMiddleware, async (req, res) => {
 })
 
 
-server.get("/products/:id", (req, res) => {
-    const id = +req.params.id
-    const foundProduct = products.find(product => product.id === id)
-    if (!foundProduct) {
-        return res.status(404).json({error:"Not found"})
-    }
+server.get("/products/:id", async (req, res) => {
+  try {
+    const id = req.params.id
+  const foundProduct = await Product.findById(id)
+    if (!foundProduct) { res.status(404).json({error:"Not found"})}
     res.json(foundProduct)
+   }
+  catch (error) {
+    res.status(404).json({error: "not found" })
+  }
 })
 
 server.post("/products", authMiddleware, async (req, res) => {
