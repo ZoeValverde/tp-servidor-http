@@ -137,19 +137,26 @@ server.post("/products", authMiddleware, async (req, res) => {
   }
 })
 
-server.put("/products/:id", (req, res) => {
-    const id = +req.params.id
+server.put("/products/:id", async (req, res) => {
+  try {
+      const id = req.params.id
     const body = req.body
-    const foundProduct = products.find(product => product.id === id)
+    const foundProduct = await Product.findByIdAndUpdate(id, body, {new: true})
     if (!foundProduct) {
         return res.status(404).json({error:"Not found"})
     }
 
     if (body.name) foundProduct.name = body.name
     if (body.price) foundProduct.price = body.price
-    if (body.stock) foundProduct.stock = body.stock
+  if (body.stock) foundProduct.stock = body.stock
+  if(body.available) foundProduct.available = body.available
         
     res.json(foundProduct)
+  }
+  catch (error) {
+   
+   res.status(400).json({ error: "Id invalido" })
+  }
 })
 
 server.delete("/products/:id", (req, res) => {
