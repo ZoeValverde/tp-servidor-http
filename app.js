@@ -56,7 +56,7 @@ const limiter = rateLimit({
   limit: 5, 
 
   handler: (request, response) => {
-    response.status(429).json({ error: "Too many requests, please try again later." })
+    response.status(429).json({success: false, error: "Too many requests, please try again later." })
   }
 })
 
@@ -64,7 +64,10 @@ const authMiddleware = (req, res, next) => {
   const header = req.headers.authorization
   
   if (!header || !header.startsWith("Bearer")) {
-    return res.status(401).json({ error: "Unauthorized" })
+    return res.status(401).json({
+      success: false,
+      error: "Unauthorized"
+    })
   }
 
   const token = header.split(" ")[1]
@@ -74,22 +77,35 @@ const authMiddleware = (req, res, next) => {
     
     req.userLogged = decoded
   } catch (e) {
-    res.status(401).json({error: e.message})
+    res.status(401).json({
+      success: false,
+      error: e.message
+    })
  }
   next()
 }
 
 server.get("/", (req, res) => {
-    res.json([{"status": 1}])
+  res.status(200).json([{
+    success: true,
+    message: "Conexión con API REST"
+    }])
 })
 
 server.get("/products", authMiddleware, async (req, res) => {
  try {
     const userLogged = req.userLogged
     const filterProducts = await Product.find({ userId: userLogged.id })
-    res.json(filterProducts)
+   res.json({
+     success: true,
+     data: filterProducts,
+     message: filterProducts.length== 0? "No hay ningún producto! añade productos a la lista": filterProducts.length== 1? "El producto fue obtenido con éxito" : "Los productos fueron obtenidos con éxito"
+    })
   } catch (error) {
-    res.status(500).json({error: "Error fetching products" })
+   res.status(500).json({
+     success: false,
+     error: "Error al recuperar productos"
+    })
   }
 })
 
@@ -97,12 +113,23 @@ server.get("/products", authMiddleware, async (req, res) => {
 server.get("/products/:id", async (req, res) => {
   try {
     const id = req.params.id
-  const foundProduct = await Product.findById(id)
-    if (!foundProduct) { res.status(404).json({error:"Not found"})}
-    res.json(foundProduct)
+    const foundProduct = await Product.findById(id)
+    if (!foundProduct) {
+      res.status(404).json({
+        success: false,
+        error: "El producto no fue encontrado"
+    })}
+    res.json({
+      success: true,
+     data: foundProduct,
+     message: "El producto fue obtenido con éxito" 
+    })
    }
   catch (error) {
-    res.status(404).json({error: "not found" })
+    res.status(404).json({
+      success: false,
+      error: "Id inválido"
+     })
   }
 })
 
@@ -130,10 +157,17 @@ server.post("/products", authMiddleware, async (req, res) => {
     createAt: newProduct.createdAt,
     updateAt: newProduct.updatedAt
   }
-    res.json(publicDataProduct)
+    res.json({
+      success: true,
+      data: publicDataProduct,
+      message: "Producto creado con éxito"
+    })
   }
   catch (error) {
-     res.status(500).json({error: "no se creo el producto"})
+    res.status(500).json({
+      success: false,
+      error: "Error al crear el producto"
+     })
   }
 })
 
@@ -141,39 +175,55 @@ server.put("/products/:id", async (req, res) => {
   try {
       const id = req.params.id
     const body = req.body
-    const foundProduct = await Product.findByIdAndUpdate(id, body, {new: true})
-    if (!foundProduct) {
-        return res.status(404).json({error:"Not found"})
+    const updatedProduct = await Product.findByIdAndUpdate(id, {...body, available: body.stock > 0 }, { returnDocument: "after" })
+    if (!updatedProduct) {
+      return res.status(404).json({
+        success: false,
+        error: "Producto no encontrado"
+        })
     }
-
-    if (body.name) foundProduct.name = body.name
-    if (body.price) foundProduct.price = body.price
-  if (body.stock) foundProduct.stock = body.stock
-  if(body.available) foundProduct.available = body.available
         
-    res.json(foundProduct)
+    res.json({
+      success: true,
+      data: updatedProduct,
+      message: "Producto actualizado con éxito"
+    })
   }
   catch (error) {
    
-   res.status(400).json({ error: "Id invalido" })
+    res.status(400).json({
+      success: false,
+      error: "Id invalido"
+    })
   }
 })
 
 server.delete("/products/:id", async (req, res) => {
   try {
     const id = req.params.id  
-  const foundProduct = await Product.findByIdAndDelete(id)
-  if (!foundProduct) {
-      return res.status(404).json({ error: "Not found" })
+  const deletedProduct = await Product.findByIdAndDelete(id)
+  if (!deletedProduct) {
+    return res.status(404).json({
+      sucess: false,
+      error: "Producto no encontrado"
+    })
     }
-  res.json({message: "Producto eliminado"})
+    res.json({
+      success: true,
+      data: deletedProduct,
+      message: "Producto eliminado con éxito"
+    })
   }
   catch (error) {
-    res.status(400).json({error: "Invalid Id"})
+    res.status(400).json({
+      success: false,
+      error: "Id inválido"
+    })
   }
 })
 
 server.post("/auth/register", async (req, res) => { 
+  try {
   const body = req.body
   const { password, username, email } = body
   const hashedPassword = await bcrypt.hash(password, 10)
@@ -193,7 +243,18 @@ server.post("/auth/register", async (req, res) => {
     updatedAt: newUser.updatedAt
   }
 
-  res.json(publicDataUser)
+    res.json({
+     success: true,
+      data: publicDataUser,
+      message: "Usuario creado con éxito"
+  })
+  }
+  catch (error) {
+    res.status(500).json({
+      success: false,
+      error: "Error al registrar el usuario"
+    })
+  }
   
 })
 
@@ -204,27 +265,43 @@ server.post("/auth/login", limiter, async (req, res) => {
   const { email, password } = body
   
   if (!email || !password) {
-    return res.status(401).json({error :"unauthorized"})
+    return res.status(401).json({
+      success: false,
+      error: "unauthorized"
+    })
   }
 
     const foundUser = await User.findOne({ email })    
   if (!foundUser) {
-    return res.status(403).json({error :"unauthorized"})
+    return res.status(403).json({
+      success: false,
+      error: "Usuario no encontrado"
+    })
   }
 
   const ValidPassword = await bcrypt.compare(password, foundUser.password)
   
   if (!ValidPassword) {
-     return res.status(403).json({error :"unauthorized", ValidPassword})
+    return res.status(403).json({
+      success: false,
+      error: "unauthorized"
+     })
   }
   const payload = {id: foundUser._id, username: foundUser.username, email: foundUser.email}
   const secretKey = "contraseñasecreta"
   const token = jwt.sign(payload, secretKey, { expiresIn:"1h"})
 
-    res.json({ token })
+    res.json({ 
+      success: true,
+      data: {token},
+      message: "Logueado con éxito"
+    })
   }
   catch (error) {
-    res.status(500).json({error: error.message})
+    res.status(500).json({
+      success: false,
+      error: "Error al Loguearse"
+    })
   }
 })
 
