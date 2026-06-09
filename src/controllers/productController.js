@@ -8,7 +8,8 @@ const getProducts = async (req, res) => {
      success: true,
      data: filterProducts,
      message: filterProducts.length== 0? "No hay ningún producto! añade productos a la lista": filterProducts.length== 1? "El producto fue obtenido con éxito" : "Los productos fueron obtenidos con éxito"
-    })
+   }
+   )
   } catch (error) {
    res.status(500).json({
      success: false,
@@ -20,9 +21,10 @@ const getProducts = async (req, res) => {
 const getProduct =  async (req, res) => {
   try {
     const id = req.params.id
-    const foundProduct = await Product.findById(id, {userId: 0})
+    const userLogged = req.userLogged
+    const foundProduct = await Product.findOne({_id: id, userId: userLogged.id},{userId:0})
     if (!foundProduct) {
-      res.status(404).json({
+      return res.status(404).json({
         success: false,
         error: "El producto no fue encontrado"
     })}
@@ -80,9 +82,10 @@ const createProduct=  async (req, res) => {
 
 const updateProduct =  async (req, res) => {
   try {
-      const id = req.params.id
+    const id = req.params.id
+    const userLogged = req.userLogged
     const body = req.body
-    const updatedProduct = await Product.findByIdAndUpdate(id, {...body, available: body.stock > 0 }, { returnDocument: "after" , projection: {userId: 0}})
+    const updatedProduct = await Product.findOneAndUpdate({_id: id, userId: userLogged.id},  {...body, available: body.stock > 0 }, { returnDocument: "after" , projection: {userId: 0}})
     if (!updatedProduct) {
       return res.status(404).json({
         success: false,
@@ -108,7 +111,7 @@ const updateProduct =  async (req, res) => {
 const deleteProduct=  async (req, res) => {
   try {
     const id = req.params.id  
-  const deletedProduct = await Product.findByIdAndDelete(id)
+  const deletedProduct = await Product.findOneAndDelete({_id: id, userId: userLogged.id})
   if (!deletedProduct) {
     return res.status(404).json({
       sucess: false,
