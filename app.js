@@ -95,7 +95,7 @@ server.get("/", (req, res) => {
 server.get("/products", authMiddleware, async (req, res) => {
  try {
     const userLogged = req.userLogged
-    const filterProducts = await Product.find({ userId: userLogged.id })
+    const filterProducts = await Product.find({ userId: userLogged.id},{userId: 0})
    res.json({
      success: true,
      data: filterProducts,
@@ -113,7 +113,7 @@ server.get("/products", authMiddleware, async (req, res) => {
 server.get("/products/:id", async (req, res) => {
   try {
     const id = req.params.id
-    const foundProduct = await Product.findById(id)
+    const foundProduct = await Product.findById(id, {userId: 0})
     if (!foundProduct) {
       res.status(404).json({
         success: false,
@@ -175,7 +175,7 @@ server.put("/products/:id", async (req, res) => {
   try {
       const id = req.params.id
     const body = req.body
-    const updatedProduct = await Product.findByIdAndUpdate(id, {...body, available: body.stock > 0 }, { returnDocument: "after" })
+    const updatedProduct = await Product.findByIdAndUpdate(id, {...body, available: body.stock > 0 }, { returnDocument: "after" , projection: {userId: 0}})
     if (!updatedProduct) {
       return res.status(404).json({
         success: false,
@@ -208,9 +208,15 @@ server.delete("/products/:id", async (req, res) => {
       error: "Producto no encontrado"
     })
     }
+
+    const product = deletedProduct.toObject()
+    delete product.userId
+
+    const publicDataProject = {...deletedProduct}
+
     res.json({
       success: true,
-      data: deletedProduct,
+      data: product,
       message: "Producto eliminado con éxito"
     })
   }
