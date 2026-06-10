@@ -111,6 +111,7 @@ const updateProduct =  async (req, res) => {
 const deleteProduct=  async (req, res) => {
   try {
     const id = req.params.id  
+    const userLogged = req.userLogged
   const deletedProduct = await Product.findOneAndDelete({_id: id, userId: userLogged.id})
   if (!deletedProduct) {
     return res.status(404).json({

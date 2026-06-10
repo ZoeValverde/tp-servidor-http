@@ -4,13 +4,18 @@ import { ProductRouter } from "./routes/productRouter.js"
 import { connectDb } from "./config/mongoDbConnection.js"
 import { authRouter } from "./routes/authRouter.js"
 import {authMiddleware} from "./middlewares/authMiddleware.js"
-
+import { config } from "dotenv"
+import cors from "cors"
+config()
+process.loadEnvFile()
 
 const server = express()
+let PORT = process.env.PORT
+
 
 server.use(express.json())
+server.use(cors())
 
-const PORT = 40000
 
 
 server.get("/", (req, res) => {
@@ -20,10 +25,9 @@ server.get("/", (req, res) => {
     }])
 })
 
-server.use("/products", authMiddleware, ProductRouter)//
+server.use("/products", authMiddleware, ProductRouter)
+
 server.use("/auth",  authRouter)
-
-
 
 server.listen(PORT, () => {
   connectDb()

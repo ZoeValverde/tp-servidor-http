@@ -1,15 +1,16 @@
-import {connect} from "mongoose"
-
+import { connect } from "mongoose"
+import { config } from "dotenv"
+config()
 const connectDb = async () => {
   
   try {
-
-    await connect("mongodb://localhost:27017/products_db")
-    console.log("se conecto al db")
+ console.log("URI:", process.env.URI_DB)
+    await connect(process.env.URI_DB)
+    console.log("Se ha conectado a la db de MongoDb")
 
    }
   catch (error) {
-    console.log("error conexion db", error.message)
+    console.log("error de conexion a la db de MongoDb", error)
   }
 
 }
