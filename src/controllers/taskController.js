@@ -12,7 +12,7 @@ const getTasks = async (req, res) => {
   } catch (error) {
    res.status(500).json({
      success: false,
-     error: "Error al recuperar productos"
+     error: "Error al recuperar las tareas"
     })
   }
 }

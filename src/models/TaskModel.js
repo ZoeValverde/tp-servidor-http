@@ -12,7 +12,7 @@ const TaskSchema = new Schema({
   }
   )
 
-const Task = model("Product", TaskSchema)
+const Task = model("Tasks", TaskSchema)
   
 
 export {Task}

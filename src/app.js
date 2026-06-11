@@ -24,7 +24,7 @@ server.get("/api", (req, res) => {
     }])
 })
 
-server.use("/api/products", authMiddleware, TaskRouter)
+server.use("/api/tasks", authMiddleware, TaskRouter)
 
 server.use("/api/auth",  authRouter)
 
