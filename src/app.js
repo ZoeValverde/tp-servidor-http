@@ -1,6 +1,6 @@
 import express from "express"
 import bcrypt from "bcryptjs" 
-import { ProductRouter } from "./routes/productRouter.js"
+import { TaskRouter } from "./routes/TaskRouter.js"
 import { connectDb } from "./config/mongoDbConnection.js"
 import { authRouter } from "./routes/authRouter.js"
 import {authMiddleware} from "./middlewares/authMiddleware.js"
@@ -24,7 +24,7 @@ server.get("/api", (req, res) => {
     }])
 })
 
-server.use("/api/products", authMiddleware, ProductRouter)
+server.use("/api/products", authMiddleware, TaskRouter)
 
 server.use("/api/auth",  authRouter)
 
