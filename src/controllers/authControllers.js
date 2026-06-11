@@ -34,8 +34,9 @@ const register = async (req, res) => {
   catch (error) {
     res.status(500).json({
       success: false,
-      error: "Error al registrar el usuario"
-    })
+      error: "Error al registrar el usuario",
+    },
+    )
   }
   
 }
@@ -70,14 +71,19 @@ const login=  async (req, res) => {
      })
   }
   const payload = {id: foundUser._id, username: foundUser.username, email: foundUser.email}
-  const secretKey = process.env.JWT_SECRET
-  const token = jwt.sign(payload, secretKey, { expiresIn:"1h"})
+    const secretKey = process.env.JWT_SECRET
+    console.log("JWT_SECRET:", process.env.JWT_SECRET)
+  const token = jwt.sign(payload, secretKey, { expiresIn: "1h" })
+  
 
+    
     res.json({ 
       success: true,
       data: {token},
       message: "Logueado con éxito"
-    })
+    },
+    
+    )
   }
   catch (error) {
     res.status(500).json({

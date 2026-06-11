@@ -6,6 +6,7 @@ import { authRouter } from "./routes/authRouter.js"
 import {authMiddleware} from "./middlewares/authMiddleware.js"
 import { config } from "dotenv"
 import cors from "cors"
+
 config()
 process.loadEnvFile()
 
@@ -16,21 +17,20 @@ let PORT = process.env.PORT
 server.use(express.json())
 server.use(cors())
 
-
-
-server.get("/", (req, res) => {
+server.get("/api", (req, res) => {
   res.status(200).json([{
     success: true,
     message: "Conexión con API REST"
     }])
 })
 
-server.use("/products", authMiddleware, ProductRouter)
+server.use("/api/products", authMiddleware, ProductRouter)
 
-server.use("/auth",  authRouter)
+server.use("/api/auth",  authRouter)
 
 server.listen(PORT, () => {
   connectDb()
-    console.log(`servidor http://localhost:${PORT}`)
+  console.log(`servidor http://localhost:${PORT}`)
+  
 }) 
 

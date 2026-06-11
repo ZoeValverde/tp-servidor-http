@@ -1,15 +1,14 @@
 import { Product } from "../models/productModel.js"
 
 const getProducts = async (req, res) => {
- try {
+  try {
     const userLogged = req.userLogged
-    const filterProducts = await Product.find({ userId: userLogged.id},{userId: 0})
+    const filterProducts = await Product.find({userId: userLogged.id},{userId: 0})
    res.json({
      success: true,
      data: filterProducts,
-     message: filterProducts.length== 0? "No hay ningún producto! añade productos a la lista": filterProducts.length== 1? "El producto fue obtenido con éxito" : "Los productos fueron obtenidos con éxito"
-   }
-   )
+     message: filterProducts.length == 0 ? "No hay ningún producto! añade productos a la lista" : filterProducts.length == 1 ? "El producto fue obtenido con éxito" : "Los productos fueron obtenidos con éxito"
+   })
   } catch (error) {
    res.status(500).json({
      success: false,
@@ -22,6 +21,7 @@ const getProduct =  async (req, res) => {
   try {
     const id = req.params.id
     const userLogged = req.userLogged
+
     const foundProduct = await Product.findOne({_id: id, userId: userLogged.id},{userId:0})
     if (!foundProduct) {
       return res.status(404).json({
@@ -42,11 +42,49 @@ const getProduct =  async (req, res) => {
   }
 }
 
-const createProduct=  async (req, res) => {
+const createProduct = async (req, res) => {
+
   try { 
     const body = req.body
-  const userLogged = req.userLogged
+    const userLogged = req.userLogged
+    const regex = /^[a-zA-Z\s]{3,10}$/
+    const error= []
 
+  if (!body.name || !body.price || !body.stock) {
+  error.push("Para crear un producto debe haber name, precio y stock")
+    } 
+
+if (!regex.test(body.name)) {
+  error.push("El nombre debe tener solo letras y espacios, con un mínimo de 3 y máximo de 10 caracteres")
+  }
+
+
+if (typeof body.price !== "number") {
+  error.push("El precio debe ser un numero")
+    }
+    
+if (typeof body.stock !== "number") {
+  error.push("El stock debe ser un numero")
+}
+
+if (error.length > 0) {
+  return res.status(400).json({
+    success: false,
+    error
+  })
+}
+
+const foundProduct = await Product.findOne({
+  name: body.name.toLowerCase(),
+  userId: userLogged.id
+})
+
+if (foundProduct) {
+  return res.status(409).json({
+    success: false,
+    error: "Hubo un conflicto, el producto ya existe"
+  })
+}
   const newProduct = await Product.create({
     name: body.name,
     price: body.price,
@@ -80,7 +118,7 @@ const createProduct=  async (req, res) => {
   }
 }
 
-const updateProduct =  async (req, res) => {
+const updateProduct = async (req, res) => {
   try {
     const id = req.params.id
     const userLogged = req.userLogged
@@ -100,7 +138,6 @@ const updateProduct =  async (req, res) => {
     })
   }
   catch (error) {
-   
     res.status(400).json({
       success: false,
       error: "Id invalido"

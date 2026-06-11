@@ -4,7 +4,6 @@ config()
 const connectDb = async () => {
   
   try {
- console.log("URI:", process.env.URI_DB)
     await connect(process.env.URI_DB)
     console.log("Se ha conectado a la db de MongoDb")
 
