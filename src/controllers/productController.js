@@ -47,10 +47,10 @@ const createProduct = async (req, res) => {
   try { 
     const body = req.body
     const userLogged = req.userLogged
-    const regex = /^[a-zA-Z\s]{3,10}$/
+    const nameRegex = /^[a-zA-Z\s]{3,10}$/
     const error= []
 
-  if (!body.name || !body.price || !body.stock) {
+  if (body.name === undefined || body.price=== undefined || body.stock=== undefined) {
   error.push("Para crear un producto debe haber name, precio y stock")
     } 
 
