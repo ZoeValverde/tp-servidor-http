@@ -84,7 +84,7 @@ const login=  async (req, res) => {
   try{
   const { body } = req
 
-  const { email, password } = body
+  const { email, password} = body
   
   if (!email || !password) {
     return res.status(401).json({
@@ -119,7 +119,7 @@ const login=  async (req, res) => {
     res.json({ 
       success: true,
       data: {token},
-      message: "Logueado con éxito"
+      message: `¡Bienvenidx ${foundUser.username} a la Api!`
     },
     
     )
