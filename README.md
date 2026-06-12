@@ -37,6 +37,7 @@ npm install
 ```
 
 ## Conexión MongoDb
+Su conexión puede crearse en MongoDB Compass o MongoDB Atlas.
 
 Para su conexión se necesita un archivo .env con los datos que se muestran en el archivo .env.example.
 ```bash
@@ -125,7 +126,7 @@ Para ello, antes de interactuar con la api necesitariamos validar que estamos lo
 |-----|-------|
 | Authorization | Bearer token |
 
-Se pondria en **Key** "Authorization" y en valor Bearer + el token de acceso creado al loguearse.
+Se pondria en **Key** "Authorization" y en **Value** Bearer + el token de acceso creado al loguearse.
 
 ##### -- GET TASKS --
 
@@ -197,14 +198,17 @@ http://localhost:40000/api/tasks/< Id de la tarea  >
 Dentro del body se debe de ingresar un name, una descrption o cambiar el complete:
 
 **Name**
+
 El name necesita tener solo letras, con un mínimo de 3 y máximo de 10 caracteres.
 
 
 **Email**
+
 El email debe ser un email válido.
  
 
 **Complete**
+
 Debe contener ser true o false
 
 No puede haber un dato vacio.
