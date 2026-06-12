@@ -73,14 +73,17 @@ Para poder crear un usuario se necesita un nombre de usuario, email y contraseñ
 en el body que recibe JSON
 
 **Name**
+
 El name necesita tener solo letras, con un mínimo de 3 y máximo de 10 caracteres.
 
 
 **Email**
+
 El email debe ser un email válido.
  
 
 **Password**
+
 Debe contener al menos 8 caracteres, una letra mayúscula, un número y un carácter especial
 
 ####  -- Ejemplo de creación de usuario ---
