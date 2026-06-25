@@ -47,11 +47,14 @@ const foundUser = await User.findOne({ email })
       })
     }
 
+  const role = req.body.email === process.env.ADMIN_EMAIL ? "admin" : "user"
+
   const hashedPassword = await bcrypt.hash(password, 10)
   const newUser = await User.create({
     username,
     email,
     password: hashedPassword,
+    role
   })
   
   newUser.save()
@@ -60,6 +63,7 @@ const foundUser = await User.findOne({ email })
     id: newUser.id,
     username: newUser.username,
     email: newUser.email,
+    role: newUser.role,
     createAt: newUser.createdAt,
     updatedAt: newUser.updatedAt
   }
@@ -109,9 +113,8 @@ const login=  async (req, res) => {
       error: "unauthorized"
      })
   }
-  const payload = {id: foundUser._id, username: foundUser.username, email: foundUser.email}
+  const payload = {id: foundUser._id, username: foundUser.username, email: foundUser.email, role: foundUser.role}
     const secretKey = process.env.JWT_SECRET
-    console.log("JWT_SECRET:", process.env.JWT_SECRET)
   const token = jwt.sign(payload, secretKey, { expiresIn: "1h" })
   
 
