@@ -10,7 +10,7 @@ const getTasks = async (req, res) => {
      message: filterTasks.length == 0 ? "No hay ninguna tarea! añade tareas a la lista" : filterTasks.length == 1 ? "La tarea fue obtenida con éxito" : "Las tareas fueron obtenidas con éxito"
    })
   } catch (error) {
-   res.status(500).json({
+   return res.status(500).json({
      success: false,
      error: "Error al recuperar las tareas"
     })
@@ -35,7 +35,7 @@ const getTask =  async (req, res) => {
     })
    }
   catch (error) {
-    res.status(404).json({
+    return res.status(404).json({
       success: false,
       error: "Id inválido"
      })
@@ -106,7 +106,7 @@ if (foundTask) {
     })
   }
   catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: "Error al crear la tarea"
      })
@@ -170,7 +170,7 @@ if (error.length > 0) {
     })
   }
   catch (error) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       error: "Id invalido"
     })
@@ -199,7 +199,7 @@ const deleteTask=  async (req, res) => {
     })
   }
   catch (error) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       error: "Id inválido"
     })

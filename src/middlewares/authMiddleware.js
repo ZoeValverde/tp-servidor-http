@@ -19,7 +19,7 @@ const authMiddleware = (req, res, next) => {
     
     req.userLogged = decoded
   } catch (e) {
-    res.status(401).json({
+    return res.status(401).json({
       success: false,
       error: e.message
     })
