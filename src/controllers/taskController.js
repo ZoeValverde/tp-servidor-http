@@ -1,4 +1,6 @@
 import { Task } from "../models/TaskModel.js"
+import { config } from "dotenv"
+config()
 
 const getTasks = async (req, res) => {
   try {
@@ -176,34 +178,37 @@ if (error.length > 0) {
     })
   }
 }
-
-const deleteTask=  async (req, res) => {
+const deleteTask = async (req, res) => {
   try {
-    const id = req.params.id  
+    const { id } = req.params
     const userLogged = req.userLogged
-  const deletedTask = await Task.findOneAndDelete({_id: id, userId: userLogged.id})
-  if (!deletedTask) {
-    return res.status(404).json({
-      sucess: false,
-      error: "Tarea no encontrada"
-    })
+
+    const AdminUser = userLogged.role === "admin"
+
+    const deletedTask = AdminUser? await Task.findByIdAndDelete(id) : await Task.findOneAndDelete({ _id: id, userId: userLogged.id })
+
+    if (!deletedTask) {
+      return res.status(404).json({
+        success: false,
+        error: "Tarea no encontrada"
+      })
     }
 
     const task = deletedTask.toObject()
-    delete Task.userId
+    delete task.userId
 
     res.json({
       success: true,
       data: task,
       message: "Tarea eliminada con éxito"
     })
-  }
-  catch (error) {
-    return res.status(400).json({
+
+  } catch (error) {
+
+    res.status(500).json({
       success: false,
-      error: "Id inválido"
+      error: "Error al eliminar la tarea"
     })
   }
 }
-
 export {getTask, getTasks,createTask, updateTask, deleteTask}

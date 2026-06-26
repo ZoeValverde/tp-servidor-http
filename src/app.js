@@ -1,5 +1,4 @@
 import express from "express"
-import bcrypt from "bcryptjs" 
 import { TaskRouter } from "./routes/TaskRouter.js"
 import { connectDb } from "./config/mongoDbConnection.js"
 import { authRouter } from "./routes/authRouter.js"
@@ -7,6 +6,7 @@ import { authMiddleware } from "./middlewares/authMiddleware.js"
 import { userRouter } from "./routes/userRouter.js"
 import { config } from "dotenv"
 import cors from "cors"
+import { adminMiddleware } from "./middlewares/adminMiddleware.js"
 
 config()
 process.loadEnvFile()
@@ -25,9 +25,9 @@ server.get("/api", (req, res) => {
     }])
 })
 
-server.use("/api/tasks", authMiddleware, TaskRouter)
 server.use("/api/auth", authRouter)
-server.use("/api/users", authMiddleware, userRouter)
+server.use("/api/tasks", authMiddleware, TaskRouter)
+server.use("/api/users", authMiddleware, adminMiddleware, userRouter)
 
 server.listen(PORT, () => {
   connectDb()
