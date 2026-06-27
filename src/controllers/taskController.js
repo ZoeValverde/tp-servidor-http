@@ -117,46 +117,10 @@ if (foundTask) {
 
 const updateTask = async (req, res) => {
   try {
-    const id = req.params.id
-    const userLogged = req.userLogged
-    const body = req.body
-    const nameRegex = /^(?=.*[a-zA-Z])[a-zA-Z\s]{3,20}$/
-    const descriptionRegex = /^(?!true$|false$).{1,100}$/
-    const error = []
+    const { id } = req.params;
+    const body = req.body;
+    const userLogged = req.userLogged;
     
-   if (
-      body.name === undefined &&
-      body.description === undefined &&
-      body.complete === undefined
-    ) {
-      return res.status(409).json({
-        success: false,
-        error: "Conflicto, debe haber name, description o complete para poder actualizar"
-      })
-    }
-
-    if (body.name !== undefined && !nameRegex.test(body.name)) {
-  error.push(
-    "El nombre debe tener solo letras y espacios, con un mínimo de 3 y máximo de 20 caracteres"
-  )
-}
-
-if (
-  body.description !== undefined &&
-  !descriptionRegex.test(body.description)) {
-  error.push("La descripción no puede estar vacía o ser un booleano")
-}
-    if (body.complete !== undefined &&typeof body.complete !== "boolean") {
-      error.push("el complete solo puede ser true o false")
-    }
-
-if (error.length > 0) {
-  return res.status(400).json({
-    success: false,
-    error
-  })
-}
-
     const updatedTask = await Task.findOneAndUpdate({_id: id, userId: userLogged.id},  {...body }, { returnDocument: "after" , projection: {userId: 0}})
     if (!updatedTask) {
       return res.status(404).json({
