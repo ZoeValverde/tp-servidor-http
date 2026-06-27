@@ -39,7 +39,7 @@ const getTask =  async (req, res) => {
   catch (error) {
     return res.status(404).json({
       success: false,
-      error: "Id inválido"
+      error: "Error al obtener la tarea"
      })
   }
 }
@@ -49,29 +49,6 @@ const createTask = async (req, res) => {
   try { 
     const body = req.body
     const userLogged = req.userLogged
-    const nameRegex = /^(?=.*[a-zA-Z])[a-zA-Z\s]{3,20}$/
-    const descriptionRegex = /^(?!true$|false$).{1,100}$/
-    const error= []
-
-  if (!body.name|| !body.description) {
-  error.push("Para crear una tarea se necesita un nombre de titulo y la descrición de tarea")
-    } 
-
-if (!nameRegex.test(body.name)) {
-  error.push("El nombre debe tener solo letras y espacios, con un mínimo de 3 y máximo de 10 caracteres")
-    }
-    
-
-if (!descriptionRegex.test(body.description)) {
-  error.push("La descripcion no puede estar vacio o con un booleano")
-  }
-
-if (error.length > 0) {
-  return res.status(400).json({
-    success: false,
-    error
-  })
-}
 
 const foundTask = await Task.findOne({
   name: body.name.toLowerCase(),
@@ -138,7 +115,7 @@ const updateTask = async (req, res) => {
   catch (error) {
     return res.status(400).json({
       success: false,
-      error: "Id invalido"
+      error: "Error al actualizar la tarea"
     })
   }
 }

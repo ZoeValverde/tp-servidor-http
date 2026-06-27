@@ -16,7 +16,7 @@ const getUsers = async (req, res) => {
     res.json({
       success: true,
       data: orderedDataUser,
-      message: "Usuarios mostrados con éxito"
+       message: orderedDataUser.length == 1 ? "El usuario fue obtenido con éxito" : "Los usuarios fueron obtenidos con éxito"
     })
 
   } catch (error) {
