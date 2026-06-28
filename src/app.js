@@ -9,7 +9,6 @@ import cors from "cors"
 import { adminMiddleware } from "./middlewares/adminMiddleware.js"
 
 config()
-process.loadEnvFile()
 
 const server = express()
 let PORT = process.env.PORT

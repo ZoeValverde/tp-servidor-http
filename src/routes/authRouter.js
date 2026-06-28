@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {limiter} from "../middlewares/limiterMiddleware.js"
 import { login, register } from "../controllers/authControllers.js";
-import { validateSchema } from "../middlewares/validateSchema.ts";
+import { validateSchema } from "../middlewares/validatorZodMidleware.ts";
 import {validatorRegisterSchema, validatorLoginSchema } from "../validators/authValidator.ts";
 
 const authRouter = Router()

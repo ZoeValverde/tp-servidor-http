@@ -1,23 +1,59 @@
+import { number } from "zod";
 import { Task } from "../models/TaskModel.js"
 import { config } from "dotenv"
 config()
-
 const getTasks = async (req, res) => {
   try {
-    const userLogged = req.userLogged
-    const filterTasks = await Task.find({userId: userLogged.id},{userId: 0})
-   res.json({
-     success: true,
-     data: filterTasks,
-     message: filterTasks.length == 0 ? "No hay ninguna tarea! añade tareas a la lista" : filterTasks.length == 1 ? "La tarea fue obtenida con éxito" : "Las tareas fueron obtenidas con éxito"
-   })
+    const userLogged = req.userLogged;
+    let sortOption = {};
+
+    const { filter, sort, page, limit } = req.validatedQuery;
+
+    const taskFilter = {
+      userId: userLogged.id,
+    };
+
+    if (filter) {
+      const [field, value] = filter.split(":");
+
+      if (field === "complete") {
+        taskFilter.complete = value === "true";
+      }
+
+      if (field === "task") {
+      taskFilter.$or = [
+    { name: { $regex: value, $options: "i" } },
+    { description: { $regex: value, $options: "i" } }
+  ]
+      }
+    }
+
+    if (sort === "asc") {
+      sortOption.createdAt = 1;
+    }
+
+    if (sort === "desc") {
+      sortOption.createdAt = -1;
+    }
+    
+    const pageNum = page || 1;
+    const limitNum = limit || 10;
+    const skip = (pageNum - 1) * limitNum;
+
+    const tasks = await Task.find(taskFilter).sort(sortOption).skip(skip).limit(limitNum);
+
+    res.json({
+      success: true,
+      data: tasks,
+      message: tasks.length === 0? "No hay usuarios para mostrar": tasks.length === 1? "La tarea fue obtenida con éxito.": "Las tareas fueron obtenidas con éxito."
+    });
   } catch (error) {
-   return res.status(500).json({
-     success: false,
-     error: "Error al recuperar las tareas"
-    })
+    res.status(500).json({
+      success: false,
+      error: "Error interno del servidor",
+    });
   }
-}
+};
 
 const getTask =  async (req, res) => {
   try {

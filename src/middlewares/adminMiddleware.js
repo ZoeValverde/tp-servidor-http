@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken"
-import { config } from "dotenv"
-config()
+
 
 const adminMiddleware = (req, res, next) => {
   const header = req.headers.authorization
@@ -11,8 +10,8 @@ const adminMiddleware = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
       req.userLogged = decoded
       
-      const userLogged = req.userLogged
-      
+    const userLogged = req.userLogged
+          
       if (userLogged.email !== process.env.ADMIN_EMAIL) {
     
     return res.status(403).json({

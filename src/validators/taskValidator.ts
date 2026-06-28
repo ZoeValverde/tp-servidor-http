@@ -1,13 +1,13 @@
 import { z } from "zod"
 
 export const createTaskSchema = z.object({
-  name: z.string().min(3, "El usuario debe tener al menos 3 caracteres").max(20, "Debe tener como máximo 20 caracteres"),
+  name: z.string().min(3, "El usuario debe tener al menos 3 caracteres").max(25, "Debe tener como máximo 25 caracteres"),
   description: z.string().min(1, "La descripción debe tener al menos 3 caracteres").max(100, "Debe tener como máximo 10 caracteres"),
   complete: z.boolean().optional(),
  });
 
 export const updateTaskSchema = z.object({
-  name: z.string().min(3, "El usuario debe tener al menos 3 caracteres").max(10, "Debe tener como máximo 10 caracteres").optional(),
+  name: z.string().min(3, "El usuario debe tener al menos 3 caracteres").max(25, "Debe tener como máximo 25 caracteres").optional(),
   description: z.string().min(1, "La descripción debe tener al menos 3 caracteres").max(100, "Debe tener como máximo 10 caracteres").optional(),
   complete: z.boolean().optional(),
 }).refine(
