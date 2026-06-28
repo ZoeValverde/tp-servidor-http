@@ -1,96 +1,133 @@
-#  API REST - Tasks (Node.js + Express + MongoDB)
+# API REST - Tasks (Node.js + Express + MongoDB)
 
-##  Descripción del proyecto
+## Descripción
 
-Este proyecto es una API REST desarrollada con **Node.js, Express y MongoDB (Mongoose)** que permite gestionar tareas de usuarios con autenticación mediante **JWT (JSON Web Token)**.
+Esta API REST permite gestionar tareas de usuarios mediante autenticación con JWT.
 
-Incluye funcionalidades como:
-- Registro e inicio de sesión de usuarios
-- Autenticación con token JWT
-- Creación, lectura, actualización y eliminación de tareas
-- Rutas protegidas para usuarios autenticados
-- Validaciones básicas de datos
+Está desarrollada con **Node.js**, **Express** y **MongoDB (Mongoose)** e incluye autenticación, autorización mediante roles y validación de datos con **Zod**.
+
+### Funcionalidades
+
+- Registro de usuarios.
+- Inicio de sesión mediante JWT.
+- CRUD completo de tareas.
+- Rutas protegidas mediante autenticación.
+- Roles de usuario (Administrador y Usuario).
+- Validación de datos con Zod.
+- Filtros, ordenamiento y paginación mediante Query Params.
 
 ---
 
-##  Tecnologías utilizadas
+# Tecnologías utilizadas
 
 - Node.js
 - Express
-- Base de datos MongoDB + Mongoose
-- JWT (jsonwebtoken)
+- MongoDB
+- Mongoose
+- JSON Web Token (JWT)
+- Zod
 - Dotenv
-- Postman (pruebas de endpoints)
+- Postman
 
 ---
 
-##  Instalación y ejecución
+# Instalación
 
 ### 1. Clonar el repositorio
+
 ```bash
 git clone <URL_REPOSITORY>
 ```
 
-#### Instala las dependencias necesarias:
+### 2. Instalar dependencias
+
 ```bash
 npm install
 ```
 
-## Conexión MongoDb
-Su conexión puede crearse en MongoDB Compass o MongoDB Atlas.
+### 3. Configurar las variables de entorno
 
-Para su conexión se necesita un archivo .env con los datos que se muestran en el archivo .env.example.
-```bash
-PORT= 
-JWT_SECRET= 
+Crear un archivo `.env` utilizando como referencia el archivo `.env.example`.
+
+```env
+PORT=
+JWT_SECRET=
 URI_DB=
+ADMIN_EMAIL=
 ```
 
-Se necesita un puerto, el Secret_Key para obtener los tokens y la URI_DB para conectar a MongoDb.
+| Variable | Descripción |
+|----------|-------------|
+| PORT | Puerto donde se ejecutará el servidor. |
+| JWT_SECRET | Clave utilizada para generar los JWT. |
+| URI_DB | URI de conexión a MongoDB. |
+| ADMIN_EMAIL | Email del usuario que tendrá permisos de administrador. |
 
-Ya cuando están esos datos solo queda levantar el server desde la consola.
+### 4. Iniciar el servidor
 
 ```bash
 npm run dev
 ```
 
-o 
+o
+
 ```bash
 node src/app.js
 ```
 
-## Endpoints
+---
 
-### Públicos
-Los endpoints publicos van a ser register y login.
+# Autenticación
 
- ### Register
-Para obtener el register en el servidor http deberia ser como el siguiente ejemplo de url http://localhost:40000/api/auth/register
+La API utiliza autenticación mediante **Bearer Token**.
+
+Después de iniciar sesión se devolverá un JWT que deberá enviarse en todas las rutas privadas.
+
+### Header requerido
+
+| Key | Value |
+|------|-------|
+| Authorization | Bearer `<token>` |
+
+Ejemplo:
+
+```text
+Authorization: Bearer eyJhbGc...
+```
+
+---
+
+# Roles
+
+La aplicación cuenta con dos tipos de usuarios.
+
+| Rol | Permisos |
+|------|-----------|
+| Usuario | Gestionar únicamente sus propias tareas. |
+| Administrador | Gestionar usuarios y visualizar todas las tareas del sistema. |
+
+---
 
 
-###### CREAR UN USUARIO
-Para poder crear un usuario se necesita un nombre de usuario, email y contraseña 
-en el body que recibe JSON
+# Endpoints
 
-**Name**
+## Públicos
 
-El name necesita tener solo letras, con un mínimo de 3 y máximo de 10 caracteres.
+### POST /api/auth/register
 
+Registra un nuevo usuario.
 
-**Email**
+#### Campos requeridos
 
-El email debe ser un email válido.
- 
+| Campo | Validación |
+|--------|------------|
+| username | Solo letras. Entre 3 y 10 caracteres. |
+| email | Debe ser un email válido. |
+| password | Mínimo 8 caracteres, una mayúscula, un número y un carácter especial. |
 
-**Password**
+#### Ejemplo
 
-Debe contener al menos 8 caracteres, una letra mayúscula, un número y un carácter especial
-
-####  -- Ejemplo de creación de usuario ---
-
-```bash
-Usuario Valido ✅
-
+```json
 {
   "username": "mickey",
   "email": "mickey@gmail.com",
@@ -98,194 +135,265 @@ Usuario Valido ✅
 }
 ```
 
-### Login
-Para obtener el Login en el servidor http deberia ser como el siguiente ejemplo de url http://localhost:40000/api/auth/login
+---
 
+### POST /api/auth/login
 
-Para iniciar sesión se necesita el email y la contraseña del usuario. En el body enviar los datos.
+Inicia sesión y devuelve un JWT.
 
-####  -- Ejemplo para iniciar sesión ---
+#### Ejemplo
 
-```bash
-Login Valido ✅
-
+```json
 {
   "email": "mickey@gmail.com",
   "password": "Hola123@"
 }
 ```
 
-Al loguearte correctamente se creara un Token, ese Token se utilizará para interactuar con los endpoints privados.
+---
 
+# Endpoints privados
 
-### Privados
-Los privados van a los de la url http://localhost:40000/api/tasks con sus distintos métodos.
+Todos requieren autenticación mediante Bearer Token.
 
-Para ello, antes de interactuar con la api necesitariamos validar que estamos logueados en los **Headers** 
+| Método | Endpoint | Descripción |
+|---------|----------|-------------|
+| GET | /api/tasks | Obtener todas las tareas del usuario autenticado. |
+| GET | /api/tasks/:id | Obtener una tarea por ID. |
+| POST | /api/tasks | Crear una nueva tarea. |
+| PATCH | /api/tasks/:id | Actualizar una tarea. |
+| DELETE | /api/tasks/:id | Eliminar una tarea. |
 
-## Headers
+---
 
-| Key | Value |
-|-----|-------|
-| Authorization | Bearer token |
+## GET /api/tasks
 
-Se pondria en **Key** "Authorization" y en **Value** Bearer + el token de acceso creado al loguearse.
+Obtiene todas las tareas del usuario autenticado.
 
-##### -- GET TASKS --
+### Respuesta
 
-Para obtener las tareas creadas en el servidor http deberia ser como el siguiente ejemplo de url http://localhost:40000/api/tasks
-
-Al validar el usuario en **Headers** debería mostrarse de esta manera:
-
-```bash
+```json
 {
-    "success": true,
-    "data": [],
-    "message": "No hay ninguna tarea! añade tareas a la lista"
+  "success": true,
+  "data": [],
+  "message": "No hay ninguna tarea. ¡Añade tareas a la lista!"
 }
 ```
 
-En caso de tener tener alguna tarea creada:
+Si existen tareas:
 
-```bash
+```json
 {
-    "success": true,
-    "data": {
-        "id": "6a2b43029ef913e89346d807",
-        "name": "tirar la basura",
-        "description": "Tirar la basura mañana a las 10 de la mañana",
-        "complete": false,
-        "createAt": "2026-06-11T23:21:38.850Z",
-        "updateAt": "2026-06-11T23:21:38.850Z"
-    },
-    "message": "Tarea creada con éxito"
-}
-```
-
-
-
-##### -- GET TASK --
-
-Para obtener una tarea creada mediante su Id en el servidor http deberia ser como el siguiente ejemplo de url http://localhost:40000/api/tasks/:id
-
-luego de "/task/" iria el id de la tarea a encontrar 
-
-http://localhost:40000/api/tasks/< Id de la tarea  >
-
-Al validar el usuario en **Headers** debería mostrarse de esta manera:
-
-```bash
-{
-    "success": true,
-    "data": {
-        "id": "6a2b43029ef913e89346d807",
-        "name": "tirar la basura",
-        "description": "Tirar la basura mañana a las 10 de la mañana",
-        "complete": false,
-        "createAt": "2026-06-11T23:21:38.850Z",
-        "updateAt": "2026-06-11T23:21:38.850Z"
-    },
-    "message": "Tarea creada con éxito"
-}
-```
-
-
-##### -- UPDATE TASK --
-
-Para actualizar una tarea creada mediante su Id en el servidor http deberia ser como el siguiente ejemplo de url http://localhost:40000/api/tasks/:id
-
-luego de "/task/" iria el id de la tarea a actualizar
-
-http://localhost:40000/api/tasks/< Id de la tarea  >
-
-Dentro del body se debe de ingresar un name, una descrption o cambiar el complete:
-
-**Name**
-
-El name necesita tener solo letras, con un mínimo de 3 y máximo de 10 caracteres.
-
-
-**Email**
-
-El email debe ser un email válido.
- 
-
-**Complete**
-
-Debe contener ser true o false
-
-No puede haber un dato vacio.
-
-Un ejemplo de como actualizar seria el siguiente:
-
-
-```bash
-Formato Valido ✅
-
-{
-  "complete": true
-}
-```
-
-Al validar el usuario en **Headers** debería mostrarse de esta manera:
-
-```bash
-{
-    "success": true,
-    "data": {
-        "id": "6a2b43029ef913e89346d807",
-        "name": "tirar la basura",
-        "description": "Tirar la basura mañana a las 10 de la mañana",
-        "complete": true,
-        "createAt": "2026-06-11T23:21:38.850Z",
-        "updateAt": "2026-06-11T23:21:38.850Z"
-    },
-    "message": "Tarea actualizada con éxito"
-}
-```
-
-
-##### -- DELETE TASK --
-
-Para eliminar una tarea creada mediante su Id en el servidor http deberia ser como el siguiente ejemplo de url http://localhost:40000/api/tasks/:id
-
-luego de "/task/" iria el id de la tarea a encontrar 
-
-http://localhost:40000/api/tasks/< Id de la tarea  >
-
-Al validar el usuario en **Headers** debería mostrarse de esta manera:
-
-```bash
-{
-    "success": true,
-    "data": {
-        "id": "6a2b43029ef913e89346d807",
-        "name": "tirar la basura",
-        "description": "Tirar la basura mañana a las 10 de la mañana",
-        "complete": false,
-        "createAt": "2026-06-11T23:21:38.850Z",
-        "updateAt": "2026-06-11T23:21:38.850Z"
-    },
-    "message": "Tarea eliminada con éxito"
+  "success": true,
+  "data": [
+    {
+      "id": "6a2b43029ef913e89346d807",
+      "name": "Tirar la basura",
+      "description": "Tirar la basura mañana a las 10",
+      "complete": false,
+      "createdAt": "2026-06-11T23:21:38.850Z",
+      "updatedAt": "2026-06-11T23:21:38.850Z"
+    }
+  ]
 }
 ```
 
 ---
 
-### Colección de Pruebas de Postman
+## GET /api/tasks/:id
 
-En este proyecto se encuentra un archivo llamado **postmanCollection.json** 
-dentro esta la colección creada para poder interactuar con la api.
+Obtiene una tarea específica mediante su ID.
 
-Para tener la colección dentro de Postman realizar los siguientes pasos:
+---
 
-1. Copiar el contenido del archivo < postmanCollection.json > 
+## POST /api/tasks
 
-2. En Postman a la derecha de donde está el buscador clickear los 3 puntos.
+Crea una nueva tarea.
 
-3. Clickear donde dice importar y copiar el contenido del archivo **postmanCollection.json**
+### Campos
 
-Si se creó correctamente tendremos requests con todos los endpoints que interactuan con la Api.
+| Campo | Obligatorio |
+|--------|-------------|
+| name | Sí |
+| description | Sí |
+| complete | No |
 
-Lo único que falta es agregar la URI que conecta con la base de datos.
+#### Ejemplo
 
+```json
+{
+  "name": "Comprar pan",
+  "description": "Ir a la panadería antes de las 18:00"
+}
+```
+
+---
+
+## PATCH /api/tasks/:id
+
+Actualiza una tarea existente.
+
+Se puede modificar:
+
+- name
+- description
+- complete
+
+#### Ejemplo
+
+```json
+{
+  "complete": true
+}
+```
+
+---
+
+## DELETE /api/tasks/:id
+
+Elimina una tarea mediante su ID.
+
+---
+
+# Query Parameters
+
+Todos los parámetros son opcionales.
+
+## filter
+
+Permite filtrar los resultados.
+
+### Filtrar por estado
+
+```http
+GET /api/tasks?filter=complete:true
+```
+
+Administrador:
+
+```http
+GET /api/tasks/all?filter=complete:true
+```
+
+---
+
+### Buscar por nombre o descripción
+
+```http
+GET /api/tasks?filter=task:comprar
+```
+
+Administrador:
+
+```http
+GET /api/tasks/all?filter=task:comprar
+```
+
+---
+
+### Buscar usuarios por nombre (Administrador)
+
+```http
+GET /api/users/all?filter=username:juan
+```
+
+---
+
+### Filtrar usuarios por rol (Administrador)
+
+```http
+GET /api/users/all?filter=role:admin
+```
+
+---
+
+## SORT
+
+Ordena los resultados por fecha de creación.
+
+Ascendente:
+
+```http
+GET /api/tasks?sort=asc
+```
+
+Descendente:
+
+```http
+GET /api/tasks?sort=desc
+```
+
+Administrador:
+
+```http
+GET /api/users/all?sort=desc
+```
+
+---
+
+## PAGE
+
+Selecciona la página de resultados.
+
+```http
+GET /api/tasks?page=2
+```
+
+Administrador:
+
+```http
+GET /api/tasks/all?page=2
+```
+
+```http
+GET /api/users/all?page=2
+```
+
+---
+
+## LIMIT
+
+Limita la cantidad de resultados.
+
+```http
+GET /api/tasks?limit=5
+```
+
+Administrador:
+
+```http
+GET /api/tasks/all?limit=5
+```
+
+```http
+GET /api/users/all?limit=5
+```
+
+---
+
+## Combinación de Query Parameters
+
+Los parámetros pueden combinarse.
+
+```http
+GET /api/tasks?filter=complete:false&sort=desc&page=2&limit=5
+```
+
+---
+
+# Colección de Postman
+
+El proyecto incluye el archivo:
+
+```text
+postmanCollection.json
+```
+
+Para importarlo:
+
+1. Abrir Postman.
+2. Seleccionar **Import**.
+3. Elegir el archivo `postmanCollection.json`.
+4. Configurar la URL base de la API.
+5. Iniciar sesión para obtener un JWT.
+6. Agregar el token en el header `Authorization` de las rutas privadas.

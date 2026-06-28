@@ -1,7 +1,7 @@
 {
   "info": {
     "_postman_id": "137d9725-3d0e-47cd-87a0-09781ef76a32",
-    "name": "New Collection",
+    "name": "Api app task",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "55835437",
     "_collection_link": "https://go.postman.co/collection/55835437-137d9725-3d0e-47cd-87a0-09781ef76a32?source=collection_link"
@@ -11,7 +11,10 @@
       "name": "Get Api",
       "request": {
         "method": "GET",
-        "header": []
+        "header": [],
+        "url": {
+          "raw": ""
+        }
       },
       "response": []
     },
@@ -19,7 +22,10 @@
       "name": "Get Tasks",
       "request": {
         "method": "GET",
-        "header": []
+        "header": [],
+        "url": {
+          "raw": ""
+        }
       },
       "response": []
     },
@@ -50,7 +56,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer <token>",
+            "value": "Bearer {{json_web_token}}",
             "type": "text"
           }
         ],
@@ -64,7 +70,7 @@
           "path": [
             "api",
             "tasks",
-            "id_task"
+            "6a2b27498c94f128e39b6a7b"
           ]
         }
       },
@@ -77,7 +83,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer <token>",
+            "value": "Bearer {{json_web_token}}",
             "type": "text"
           }
         ],
@@ -100,7 +106,7 @@
           "path": [
             "api",
             "tasks",
-            "id_task"
+            "6a2b27498c94f128e39b6a7b"
           ]
         }
       },
@@ -110,12 +116,138 @@
       "name": "Post register",
       "request": {
         "method": "GET",
-        "header": []
+        "header": [],
+        "url": {
+          "raw": ""
+        }
       },
       "response": []
     },
     {
       "name": "Post login",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Tasks query filter complete",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "Get Tasks query filter task",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "Get Tasks query sort",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "Get Tasks query page",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "Get Tasks query limit",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "Get Tasks Admin",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "Get Users Admin",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Users Admin",
+      "request": {
+        "method": "DELETE",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "Get Tasks Admin query filter complete",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "Get Tasks Admin query filter task",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "Get Users Admin query filter username",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "Get Users Admin query filter role",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "Get Tasks Admin query sort",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "Get Tasks Admin query page",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "Get Tasks Admin query limit",
       "request": {
         "method": "GET",
         "header": []
