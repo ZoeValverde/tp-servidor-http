@@ -15,7 +15,6 @@ const getUsers = async (req, res) => {
   if (field === "username") {userFilter.username = {$regex: value, $options: "i"};}
 
       if (field === "role") { userFilter.role = value; }
-    
   }
 
   if (sort === "asc") {sortOption.createdAt = 1;}
@@ -51,7 +50,6 @@ const getUsers = async (req, res) => {
   }
 };
 
-
 const deleteUser=  async (req, res) => {
   try {
     const id = req.params.id  
@@ -63,7 +61,6 @@ const deleteUser=  async (req, res) => {
       error: "Usuario no encontrado"
     })
       }
-      
       
 const orderedDataUser = {
       id: deletedUser.id, 
@@ -86,6 +83,5 @@ const orderedDataUser = {
     })
   }
 }
-
 
 export{getUsers, deleteUser}

@@ -1,5 +1,4 @@
 import { Task } from "../models/TaskModel.js"
-import {User} from "../models/userModel.js"
 
 const adminGetTasks = async (req, res) => {
   try {

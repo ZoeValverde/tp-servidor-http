@@ -7,7 +7,6 @@ import { validateSchema } from "../middlewares/validatorZodMidleware.ts"
 import { QuerySchema } from "../validators/QuerySchema.ts"
 import { validateQuery } from "../middlewares/validateQuery.js"
 
-
 const TaskRouter = Router()
 
 TaskRouter.get("/", validateQuery(QuerySchema), getTasks)

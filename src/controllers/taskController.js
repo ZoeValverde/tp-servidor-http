@@ -45,7 +45,7 @@ const getTasks = async (req, res) => {
     res.json({
       success: true,
       data: tasks,
-      message: tasks.length === 0? "No hay usuarios para mostrar": tasks.length === 1? "La tarea fue obtenida con éxito.": "Las tareas fueron obtenidas con éxito."
+      message: tasks.length === 0? "No hay tareas para mostrar": tasks.length === 1? "La tarea fue obtenida con éxito.": "Las tareas fueron obtenidas con éxito."
     });
   } catch (error) {
     res.status(500).json({

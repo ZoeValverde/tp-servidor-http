@@ -7,7 +7,6 @@ export const validateSchema =
 
     const result = schema.safeParse(req[target]);
     
-
     if (!result.success) {
       res.status(400).json({
         success: false,
