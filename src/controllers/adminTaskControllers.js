@@ -1,4 +1,5 @@
 import { Task } from "../models/TaskModel.js"
+import {User} from "../models/userModel.js"
 
 const adminGetTasks = async (req, res) => {
   try {
@@ -32,7 +33,7 @@ const adminGetTasks = async (req, res) => {
         const limitNum = limit || 10;
         const skip= (pageNum - 1) * limitNum;
     
-    const tasks = await Task.find(taskFilter).sort(sortOption).skip(skip).limit(limitNum);
+    const tasks = await Task.find(taskFilter).populate("userId", "username").sort(sortOption).skip(skip).limit(limitNum);
 
     const OrderedDataTask = tasks.map(task => ({
       id: task._id,

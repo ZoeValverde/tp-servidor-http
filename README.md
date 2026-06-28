@@ -104,7 +104,7 @@ La aplicación cuenta con dos tipos de usuarios.
 | Rol | Permisos |
 |------|-----------|
 | Usuario | Gestionar únicamente sus propias tareas. |
-| Administrador | Gestionar usuarios y visualizar todas las tareas del sistema. |
+| Administrador | Gestionar las tareas y los users, visualizando todos y pudiendo eliminarlos  |
 
 ---
 
@@ -259,7 +259,7 @@ Elimina una tarea mediante su ID.
 
 Todos los parámetros son opcionales.
 
-## filter
+## FILTER
 
 Permite filtrar los resultados.
 
