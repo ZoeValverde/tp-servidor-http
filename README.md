@@ -104,7 +104,7 @@ La aplicación cuenta con dos tipos de usuarios.
 | Rol | Permisos |
 |------|-----------|
 | Usuario | Gestionar únicamente sus propias tareas. |
-| Administrador | Gestionar las tareas y los users, visualizando todos y pudiendo eliminarlos  |
+| Administrador | Gestionar las tareas y los users, visualizando todos y pudiendo eliminarlos |
 
 ---
 
@@ -231,7 +231,7 @@ Crea una nueva tarea.
 
 ## PATCH /api/tasks/:id
 
-Actualiza una tarea existente.
+Actualiza una tarea existente utiizando el id.
 
 Se puede modificar:
 
